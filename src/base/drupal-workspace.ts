@@ -15,6 +15,7 @@ import PHPStanProvider from '../providers/phpstan';
 import RoutingCompletionProvider from '../providers/routing';
 import ServicesCompletionProvider from '../providers/services';
 import TwigCompletionProvider from '../providers/twig-completion';
+import RecipesCompletionProvider from '../providers/recipes-completion';
 import { Tail } from '../types';
 import getComposerLock from '../utils/get-composer-lock';
 import TranslationProvider from '../providers/translation';
@@ -59,6 +60,9 @@ export default class DrupalWorkspace extends Disposable {
         ),
       }),
       new TwigCompletionProvider({
+        drupalWorkspace: this,
+      }),
+      new RecipesCompletionProvider({
         drupalWorkspace: this,
       }),
       new PHPCBFProvider({
