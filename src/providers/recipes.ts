@@ -8,8 +8,8 @@ export type options = {
 
 export const defaultAttributes: options[] = [
     {
-        label: 'name',
-        insertText: 'name: "',
+        label: 'xname',
+        insertText: 'xname: "',
         type: 'string',
         documentation: 'Recipe name',
         parent: '',

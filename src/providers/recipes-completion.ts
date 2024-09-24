@@ -6,27 +6,19 @@ import {
   Position,
   workspace,
   SnippetString,
-  Uri,
   languages,
   window,
-  commands,
 } from 'vscode';
+
 import { options, defaultAttributes } from './recipes';
-import { Class as ASTClass, Method, Namespace } from 'php-parser';
-import phpParser from '../utils/php-parser';
-import docParser from '../utils/doc-parser';
-import { parse as parseYaml, stringify } from 'yaml';
+import { Class as ASTClass } from 'php-parser';
+import { parse as parseYaml } from 'yaml';
 import DrupalWorkspaceProvider from '../base/drupal-workspace-provider';
-import getName from '../utils/get-name';
-import { CompletionItemWithCallback } from '../types';
 
 const astFileCache = new Map<string, ASTClass>();
 
 // Stores the full list of attributes.
 let autocompleteList:options[] = [];
-
-// Stores current celection of attributes.
-let currentList = autocompleteList;
 
 export default class RecipesCompletionProvider
   extends DrupalWorkspaceProvider

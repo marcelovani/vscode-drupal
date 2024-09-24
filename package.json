@@ -76,6 +76,10 @@
       {
         "fileMatch": "*.permissions.yml",
         "url": "https://json.schemastore.org/drupal-permissions.json"
+      },
+      {
+        "fileMatch": "recipe.yml",
+        "url": "https://json.schemastore.org/drupal-recipe.json"
       }
     ],
     "commands": [
