@@ -9,11 +9,8 @@ import {
   window,
 } from 'vscode';
 
-import { Class as ASTClass } from 'php-parser';
 import { parse as parseYaml } from 'yaml';
 import DrupalWorkspaceProvider from '../base/drupal-workspace-provider';
-
-const astFileCache = new Map<string, ASTClass>();
 
 export type options = {
   label: string
