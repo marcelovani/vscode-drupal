@@ -1,6 +1,5 @@
 import {
   CompletionItem,
-  CompletionItemKind,
   CompletionItemProvider,
   TextDocument,
   Position,
@@ -23,9 +22,6 @@ export type options = {
   documentation: string,
   parent: string,
 }
-
-// Stores the full list of attributes.
-let autocompleteList:options[] = [];
 
 export default class RecipesCompletionProvider
   extends DrupalWorkspaceProvider
@@ -55,45 +51,40 @@ export default class RecipesCompletionProvider
 
   async parseYamlFiles() {
     const completions: CompletionItem[] = [];
-    const files =  await this.drupalWorkspace.findFiles('**/*.yml', '{vendor,node_modules}');
+    const files =  await this.drupalWorkspace.findFiles('**/*.yml', '{vendor, node_modules}');
+    const ignore: string[] = [
+      '.libraries.yml',
+      '.services.yml',
+      '.field_type_categories.yml',
+      '.link_relation_types.yml',
+      'core.entity',
+    ];
 
+    // Helper function to check if the file should be skipped.
+    let shouldIgnore = (filePath: string, ignoreList: string[]): boolean => {
+      return ignoreList.some(ignoreItem => filePath.includes(ignoreItem));
+    };
+    
     let type = '';
     let label = '';
-    let detail = '';
 
     for (const path of files) {
+      // Check cache.
       if (this.completionFileCache.get(path.fsPath)) {
         continue;
       }
 
-      // @todo add these items to array and loop
-      if (path.toString().includes('.libraries.yml')) {
-        // Exclude libraries.
+      let filePath: string = path.toString();
+
+      // Check if file should be skipped.
+      if (shouldIgnore(filePath, ignore)) {
         continue;
       }
-      else if (path.toString().includes('.services.yml')) {
-        // Exclude services.
-        continue;
-      }
-      else if (path.toString().includes('.field_type_categories.yml')) {
-        // Exclude field_type_categories.
-        continue;
-      }
-      else if (path.toString().includes('.link_relation_types.yml')) {
-        // Exclude link_relation_types.
-        continue;
-      }
-      else if (path.toString().includes('/recipe.yml')) {
+
+      // Check file contents.
+      if (path.toString().includes('/recipe.yml')) {
         type = 'recipe';
         label = 'Recipe';
-      }
-      else if (path.toString().includes('/config/')) {
-        // Exclude config schema.
-        if (path.toString().includes('/schema/')) {
-          continue;
-        }
-        type = 'config';
-        label = 'Config';
       }
       else if (path.toString().includes('/profiles/')) {
         type = 'profile';
@@ -110,6 +101,14 @@ export default class RecipesCompletionProvider
       else if (path.toString().includes('/default_content/') || path.toString().includes('/content/')) {
         type = 'content';
         label = 'Content';
+      }
+      else if (path.toString().includes('/config/')) {
+        // Exclude config schema.
+        if (path.toString().includes('/schema/')) {
+          continue;
+        }
+        type = 'config';
+        label = 'Config';
       }
       else {
         console.log('Excluded', path);
@@ -132,6 +131,7 @@ export default class RecipesCompletionProvider
         }
       }
 
+      // Prepare completion item.
       let regex = null;
       let match = null;
       let insertText = '';
