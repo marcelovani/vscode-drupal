@@ -10,12 +10,19 @@ import {
   window,
 } from 'vscode';
 
-import { options, defaultAttributes } from './recipes';
 import { Class as ASTClass } from 'php-parser';
 import { parse as parseYaml } from 'yaml';
 import DrupalWorkspaceProvider from '../base/drupal-workspace-provider';
 
 const astFileCache = new Map<string, ASTClass>();
+
+export type options = {
+  label: string
+  insertText: string,
+  type: string,
+  documentation: string,
+  parent: string,
+}
 
 // Stores the full list of attributes.
 let autocompleteList:options[] = [];
@@ -31,7 +38,6 @@ export default class RecipesCompletionProvider
 
   constructor(arg: ConstructorParameters<typeof DrupalWorkspaceProvider>[0]) {
     super(arg);
-    autocompleteList = defaultAttributes;
 
     this.disposables.push(
       languages.registerCompletionItemProvider(
@@ -244,20 +250,6 @@ export default class RecipesCompletionProvider
       let firstOccurrenceIndex = self.findIndex(t => t.label === item.label);
       return index === firstOccurrenceIndex;
     });
-
-    // When there is no completion for this context, show default items.
-    if (filtered.length == 0) {
-      filtered = defaultAttributes.map((item) =>
-        Object.assign(JSON.parse(JSON.stringify(item)), {
-          detail: `Attribute (${item.type})`,
-          kind: CompletionItemKind.Field,
-          insertText: new SnippetString(item.type == 'array' ? `${item.insertText}` : item.insertText),
-        })
-      ).filter((item) =>
-        // Show top level attributes or attributes for parent.
-        (position.character == 0 && item.parent == '') || item.parent == parentAttribute
-      );
-    }
 
     return filtered.map((item) => {
       const newItem = Object.assign({}, item);
